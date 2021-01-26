@@ -42,7 +42,8 @@ FoldSet(op(_,_), base, set) ==
   ReduceSet(op, set, base) 
 
 
+
 =============================================================================
 \* Modification History
-\* Last modified Tue Jan 26 11:35:49 CET 2021 by marty
+\* Last modified Tue Jan 26 13:00:44 CET 2021 by marty
 \* Created Tue Jan 26 11:26:58 CET 2021 by marty
