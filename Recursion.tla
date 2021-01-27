@@ -39,11 +39,26 @@ FoldFun(op(_,_), base, fun) ==
   Reduce(op, fun, 1, Cardinality(DOMAIN fun), base) 
 
 FoldSet(op(_,_), base, set) ==
-  ReduceSet(op, set, base) 
+  ReduceSet(op, set, base)
+  
+BigSet == FoldFun(LAMBDA x, y: x \cup y, {}, {})
 
+Test1 == FoldSet(LAMBDA x, y: x \cup y, {}, {{1,2,3}, {2,3,4}, {4,5,6}}) \* set flattening
+Test2 == FoldSet(LAMBDA x, y: x /\ y, TRUE, {TRUE, FALSE,TRUE}) \* propositional clause evaluation
+Test3 == FoldSet(LAMBDA x, y: x \ y, {}, {{1,2,3}, {2,3,4}, {4,5,6}}) \* set difference -- is this well defined? suppose choose picks {4,5,6} first, we should get {6}, if we shoose {1,2,3} first we chould get {1}
+Test4 == FoldSet(LAMBDA x, y: x \ y, {}, {{4,5,6}, {2,1,3}, {2,3,4}}) \* set difference -- is this well defined? suppose choose picks {4,5,6} first, we should get {6}, if we shoose {1,2,3} first we chould get {1}
+Test5 == Test3 = Test4 \* surprised this works
 
+AllTests == /\ Test1 = {1,2,3,4,5, 6}
+            /\ ~Test2
+            /\ Test5
+
+\* fake state to evaluate expression
+VARIABLE x
+Init == x = 0
+Next == UNCHANGED x
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Jan 26 13:00:44 CET 2021 by marty
+\* Last modified Wed Jan 27 01:25:55 CET 2021 by marty
 \* Created Tue Jan 26 11:26:58 CET 2021 by marty
