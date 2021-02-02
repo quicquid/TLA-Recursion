@@ -3,9 +3,9 @@ Motivation
 
 When reasoning within one state it is often helpful to have tools from
 functional programming. Map and filter can already be expressed, fold / reduce
-is defined for different use cases in multiple locations. The effort of
-evaluating these fold operators is different: e.g. ReduceSet recurses on
-all subsets of the input set while Reduce has an extra parameter fun that
+is defined for different use cases in multiple locations. The semantics of
+evaluating these fold operators is different: e.g. ReduceSet defines an arbitrary ordering
+of the input set (where it's not always clear if any ordering is permissible) while Reduce has an extra parameter fun that
 defines an ordering that prevents reasoning on all subsets. By making assumptions
 on the arguments or the level of the operator we could use an efficient
 specialized implementations for these cases in a back-end while keeping
