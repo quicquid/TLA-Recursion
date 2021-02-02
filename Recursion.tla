@@ -2,7 +2,6 @@
 
 EXTENDS Naturals, FiniteSets 
 
-
 (* Operators that were previously defined in various places *)
 
 (* This operator is originally defined at:
@@ -94,6 +93,11 @@ FoldSet(op(_,_), base, set) ==
 
 (* Use cases *)
   
+\* fake state to evaluate expression
+VARIABLE X
+Init == X = 0
+Next == UNCHANGED X
+
 BigSet == FoldFun(LAMBDA x, y: x \cup y, {}, {})
 
 Test1 == FoldSet(LAMBDA x, y: x \cup y, {}, {{1,2,3}, {2,3,4}, {4,5,6}}) \* set flattening
@@ -101,22 +105,20 @@ Test2 == FoldSet(LAMBDA x, y: x /\ y, TRUE, {TRUE, FALSE,TRUE}) \* propositional
 Test3 == FoldSet(LAMBDA x, y: x \ y, {}, {{1,2,3}, {2,3,4}, {4,5,6}}) \* set difference -- is this well defined? suppose choose picks {4,5,6} first, we should get {6}, if we shoose {1,2,3} first we chould get {1}
 Test4 == FoldSet(LAMBDA x, y: x \ y, {}, {{4,5,6}, {2,1,3}, {2,3,4}}) \* set difference -- is this well defined? suppose choose picks {4,5,6} first, we should get {6}, if we shoose {1,2,3} first we chould get {1}
 Test5 == Test3 = Test4 \* surprised this works
+Test6 == FoldSet(LAMBDA x, y: X' # x /\ y, X' # 0, {1, 2}) \* creating an action by recursion -- outside of the target set
 
 (* a probably most common use case for fold: summing up the arguments *)
-Test6 == FoldSet(LAMBDA x, y: x + y, 0, 1..10)
+Test7 == FoldSet(LAMBDA x, y: x + y, 0, 1..10)
 
 AllTests == /\ Test1 = {1,2,3,4,5, 6}
             /\ ~Test2
             /\ Test5
             /\ Test6 = 55
 
-\* fake state to evaluate expression
-VARIABLE x
-Init == x = 0
-Next == UNCHANGED x
+
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 27 01:25:55 CET 2021 by marty
+\* Last modified Tue Feb 02 16:52:38 CET 2021 by marty
 \* Created Tue Jan 26 11:26:58 CET 2021 by marty
 
