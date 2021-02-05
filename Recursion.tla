@@ -11,6 +11,12 @@ EXTENDS Naturals, FiniteSets
 LOCAL Reduce(op(_,_), fun, from, to, base) == 
 (**************************************************************************)
 (* Reduce the elements in the range from..to of the function's co-domain. *)
+(* sm: I see two drawbacks with this definition:                          *)
+(* 1. It only applies to functions with integer domains.                  *)
+(* 2. The definition assumes that the interval is non-empty.              *)
+(* On the other hand, it is perhaps useful that the order of evaluation   *)
+(* is fixed (even if people may intuitively expect to evaluate the        *)
+(* function in ascending order).                                          *)
 (**************************************************************************)
   LET reduced[i \in from..to] ==
     IF i = from THEN op(base, fun[i])
@@ -73,7 +79,20 @@ FoldFun(op(_,_), base, fun) ==
     This is an implementation in terms of previously defined operators.
     A tool is free to define its own, more efficient, implementation.
    *) 
+  (* sm: Again, this only works for functions that take integers, and
+     it assumes that the domain of the function is non-empty. *)
   Reduce(op, fun, 1, Cardinality(DOMAIN fun), base) 
+
+(***************************************************************************)
+(* Starting from base, apply op to f(x), for all x \in S, in an arbitrary  *)
+(* order. It is assumed that op is associative and commutative.            *)
+(***************************************************************************)
+FoldMap(op(_,_), base, f(_), S) ==
+  LET iter[s \in SUBSET S] ==
+        IF s = {} THEN base
+        ELSE LET x == CHOOSE x \in s : TRUE
+             IN  op(f(x), iter[s \ {x}])
+  IN  iter[S]
 
 (*
    Intuitive semantics:
@@ -89,7 +108,15 @@ FoldSet(op(_,_), base, set) ==
     This is an implementation in terms of previously defined operators.
     A tool is free to define its own, more efficient, implementation.
    *) 
-  ReduceSet(op, set, base)
+(*  ReduceSet(op, set, base) *)
+  (* sm: alternative, equivalent definition *)
+  FoldMap(op, base, LAMBDA x : x, set)
+
+(***************************************************************************)
+(* Fold over a function (or sequence).                                     *)
+(***************************************************************************)
+FoldFunction(op(_,_), base, fun) == 
+  FoldMap(op, base, LAMBDA i : fun[i], DOMAIN fun)
 
 (* Use cases *)
   
@@ -110,6 +137,13 @@ Test6 == FoldSet(LAMBDA x, y: X' # x /\ y, X' # 0, {1, 2}) \* creating an action
 (* a probably most common use case for fold: summing up the arguments *)
 Test7 == FoldSet(LAMBDA x, y: x + y, 0, 1..10)
 
+Test8 == FoldFunction(LAMBDA x,y : x+y, 0, [i \in 1..10 |-> i])
+Test9 == FoldSet(LAMBDA x,y : x+y, 0, {})
+
+(* compute the sum of the first 5 square numbers *)
+Test10 == FoldMap(LAMBDA x,y : x+y, 0, LAMBDA x : x*x, 1..5)
+Test11 == Test7 = Test10
+
 AllTests == /\ Test1 = {1,2,3,4,5, 6}
             /\ ~Test2
             /\ Test5
@@ -119,6 +153,6 @@ AllTests == /\ Test1 = {1,2,3,4,5, 6}
 
 =============================================================================
 \* Modification History
+\* Last modified Fri Feb 05 12:06:07 CET 2021 by merz
 \* Last modified Tue Feb 02 16:52:38 CET 2021 by marty
 \* Created Tue Jan 26 11:26:58 CET 2021 by marty
-
